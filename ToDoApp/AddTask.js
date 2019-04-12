@@ -26,6 +26,7 @@ class AddTask extends Component{
         todo.title = this.state.title;
         todo.description = this.state.description;
         todo.time = moment().unix();
+        todo.completed = false;
         try {
           let tasks = JSON.parse(await AsyncStorage.getItem('TASKS'));
           console.log(tasks);

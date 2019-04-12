@@ -4,6 +4,7 @@ import {
   View, SafeAreaView, TouchableHighlight, 
   AsyncStorage
 } from 'react-native';
+import moment from 'moment';
 
 class Home extends Component {
 
@@ -13,7 +14,7 @@ class Home extends Component {
   }
 
   componentDidMount(){
-    loadData = async() => {
+    /*loadData = async() => {
       try {
         let tasks = JSON.parse(await AsyncStorage.getItem('TASKS'));
         console.log(tasks);
@@ -22,7 +23,13 @@ class Home extends Component {
         // Error saving data
         console.log(error);
       }
-    }
+    }*/
+    AsyncStorage.getItem("TASKS")
+    .then(value => {
+      this.setState({ "taskList": JSON.parse(value) });
+      console.log("componentDidMount : " + JSON.parse(value));
+    })
+    .done();
   }
 
   static navigationOptions = ({ navigation }) => {
@@ -43,9 +50,10 @@ class Home extends Component {
   }
 
   onPressNote = (item) => {
+    console.log(item);
+    item.completed = !item.completed
     this.setState({
-      count: this.state.count + 1
-      //item uuid4
+      
     })
   }
 
@@ -60,12 +68,16 @@ class Home extends Component {
               onPress={(e) => this.onPressNote(item)}
             >
               <View>
-                <Text style={styles.item}>{item.title}</Text>
-                <Text style={styles.item}>{item.description}</Text>
+                <View style={styles.item}>
+                  <Text style={{...styles.title, textDecorationLine:item.completed?'line-through':'none'}}>{item.title}</Text>
+                  <Text style={{...styles.itemDescription, textDecorationLine:item.completed?'line-through':'none'}}>{item.description}</Text>
+                  <Text style={{...styles.itemTime, textDecorationLine:item.completed?'line-through':'none'}}>Created on {moment.unix(item.time).format("DD MMM, h:mmA")}</Text>
+                </View>
                 <View style={styles.separator} />
               </View>
             </TouchableHighlight>
           }
+          keyExtractor={(item, index) => index.toString()}
         />
       </SafeAreaView>
     );
@@ -84,8 +96,21 @@ const styles = StyleSheet.create({
   },
   item: {
     padding: 10,
+  },
+  itemDescription: {
+    margin: 5,
     fontSize: 18,
-    height: 44,
+    alignItems: 'flex-start',
+  },
+  itemTime: {
+    margin: 5,
+    fontSize: 18,
+    alignItems: 'flex-start',
+  },
+  title: {
+    margin: 5,
+    fontSize: 20,
+    fontWeight: 'bold',
     alignItems: 'flex-start',
   },
   separator: {
